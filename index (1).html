@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Campus Lost &amp; Found</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eceef6;--surface:#fff;--ink:#1c1b3a;--mute:#625f80;--line:#d3d6e6;--lost:#d02f68;--found:#0a8a87;--brand:#2c2a6b;--brand-ink:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#13122b;--surface:#1c1b3d;--ink:#ecebfa;--mute:#9a97c0;--line:#33316a;--lost:#ff6b9a;--found:#3fd2cd;--brand:#8e8cff;--brand-ink:#13122b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#13122b;--surface:#1c1b3d;--ink:#ecebfa;--mute:#9a97c0;--line:#33316a;--lost:#ff6b9a;--found:#3fd2cd;--brand:#8e8cff;--brand-ink:#13122b;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Sora,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+header{background:var(--brand);color:var(--brand-ink);padding:36px 20px 44px}
+.wrap{max-width:980px;margin:0 auto}
+h1{margin:0 0 8px;font-size:clamp(30px,6vw,52px);font-weight:800;letter-spacing:-.03em;line-height:1.05}
+header p{margin:0;max-width:52ch;opacity:.9}
+.stats{display:flex;gap:28px;margin-top:22px;flex-wrap:wrap}
+.stats div{font-size:14px}.stats b{display:block;font-size:30px;font-weight:800;line-height:1}
+main{padding:24px 20px 60px}
+.layout{display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start}
+@media(max-width:780px){.layout{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+h2{font-size:18px;margin:0 0 12px;font-weight:600}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
+input,select,textarea{width:100%;font:400 15px inherit;font-family:inherit;padding:10px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink)}
+textarea{resize:vertical;min-height:64px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.seg button{font:600 14px inherit;font-family:inherit;padding:10px;border-radius:9px;border:2px solid var(--line);background:none;color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"][data-t="lost"]{border-color:var(--lost);color:var(--lost)}
+.seg button[aria-pressed="true"][data-t="found"]{border-color:var(--found);color:var(--found)}
+.submit{margin-top:14px;width:100%;font:600 16px inherit;font-family:inherit;border:0;border-radius:10px;padding:13px;background:var(--brand);color:var(--brand-ink);cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.err{color:var(--lost);font-size:13px;min-height:1.2em;margin:8px 0 0}
+.filters{display:grid;grid-template-columns:1fr 150px 150px;gap:10px;margin-bottom:16px}
+@media(max-width:560px){.filters{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--lost);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.card.found{border-left-color:var(--found)}
+.card.claimed{opacity:.6}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.badge{font-size:13px;font-weight:600;color:var(--lost)}
+.card.found .badge{color:var(--found)}
+.card h3{margin:2px 0 4px;font-size:18px;font-weight:600}
+.card.claimed h3{text-decoration:line-through}
+.meta{font-size:13px;color:var(--mute)}
+.desc{margin:8px 0;font-size:14px}
+.acts{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.acts button{font:600 13px inherit;font-family:inherit;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--ink);cursor:pointer}
+.contact{font-size:13px;font-weight:600}
+.empty{text-align:center;color:var(--mute);padding:36px 10px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Campus Lost &amp; Found</h1>
+  <p>Lost something on campus? Found something that isn’t yours? Post it here so the right person can find it.</p>
+  <div class="stats">
+    <div><b id="sLost">0</b>items lost</div>
+    <div><b id="sFound">0</b>items found</div>
+    <div><b id="sClaimed">0</b>returned</div>
+  </div>
+</div></header>
+<main><div class="wrap layout">
+  <section class="panel" aria-labelledby="fh">
+    <h2 id="fh">Report an item</h2>
+    <div class="seg" role="group" aria-label="Item type">
+      <button type="button" data-t="lost" aria-pressed="true">I lost it</button>
+      <button type="button" data-t="found" aria-pressed="false">I found it</button>
+    </div>
+    <label for="title">Item name</label><input id="title" maxlength="60" placeholder="Blue water bottle">
+    <label for="cat">Category</label>
+    <select id="cat"><option>Electronics</option><option>ID &amp; Cards</option><option>Books &amp; Notes</option><option>Bags</option><option>Keys</option><option>Other</option></select>
+    <label for="loc">Where</label><input id="loc" maxlength="60" placeholder="Library, 2nd floor">
+    <label for="date">Date</label><input id="date" type="date">
+    <label for="contact">Your contact (email or phone)</label><input id="contact" maxlength="60">
+    <label for="desc">Details</label><textarea id="desc" maxlength="200" placeholder="Colour, brand, stickers…"></textarea>
+    <p class="err" id="err" role="alert"></p>
+    <button class="submit" id="post" type="button">Post item</button>
+  </section>
+  <section aria-label="Posted items">
+    <div class="filters">
+      <input id="q" type="search" placeholder="Search items or places" aria-label="Search items">
+      <select id="ft" aria-label="Filter by type"><option value="">All types</option><option value="lost">Lost</option><option value="found">Found</option></select>
+      <select id="fc" aria-label="Filter by category"><option value="">All categories</option></select>
+    </div>
+    <div id="list"></div>
+  </section>
+</div></main>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var CATS=['Electronics','ID & Cards','Books & Notes','Bags','Keys','Other'];
+var type='lost',items=[];
+function today(d){return new Date(Date.now()-(d||0)*864e5).toISOString().slice(0,10)}
+var SEED=[
+ {id:1,type:'lost',title:'Black laptop charger',cat:'Electronics',loc:'Block C, Room 204',date:today(1),contact:'asha@example.edu',desc:'65W, cable has green tape near the plug.',claimed:false},
+ {id:2,type:'found',title:'Student ID card',cat:'ID & Cards',loc:'Canteen entrance',date:today(2),contact:'Security desk, Gate 1',desc:'Card is for a first-year student. Name is partly faded.',claimed:false},
+ {id:3,type:'found',title:'Data Structures notebook',cat:'Books & Notes',loc:'Library reading hall',date:today(3),contact:'ravi@example.edu',desc:'Red cover with a cricket sticker.',claimed:true}
+];
+function load(){try{var d=JSON.parse(localStorage.getItem('lf-v1')||'null');items=d||SEED}catch(e){items=SEED}}
+function save(){try{localStorage.setItem('lf-v1',JSON.stringify(items))}catch(e){}}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function render(){
+  var q=$('q').value.trim().toLowerCase(),ft=$('ft').value,fc=$('fc').value;
+  $('sLost').textContent=items.filter(function(i){return i.type==='lost'&&!i.claimed}).length;
+  $('sFound').textContent=items.filter(function(i){return i.type==='found'&&!i.claimed}).length;
+  $('sClaimed').textContent=items.filter(function(i){return i.claimed}).length;
+  var L=$('list');L.innerHTML='';
+  var shown=items.filter(function(i){
+    return (!ft||i.type===ft)&&(!fc||i.cat===fc)&&(!q||(i.title+' '+i.loc+' '+i.desc).toLowerCase().indexOf(q)>-1)
+  }).sort(function(a,b){return b.id-a.id});
+  if(!shown.length){L.appendChild(el('p','empty','No items match. Try a different search, or post the item yourself.'));return}
+  shown.forEach(function(i){
+    var c=el('article','card '+i.type+(i.claimed?' claimed':''));
+    var top=el('div','top');
+    top.appendChild(el('span','badge',(i.type==='lost'?'Lost':'Found')+(i.claimed?' – returned':'')));
+    top.appendChild(el('span','meta',i.date));
+    c.appendChild(top);c.appendChild(el('h3',null,i.title));
+    c.appendChild(el('div','meta',i.cat+' · '+i.loc));
+    if(i.desc)c.appendChild(el('p','desc',i.desc));
+    var a=el('div','acts');a.appendChild(el('span','contact','Contact: '+i.contact));
+    var b=el('button',null,i.claimed?'Reopen':'Mark as returned');
+    b.onclick=function(){i.claimed=!i.claimed;save();render()};
+    var d=el('button',null,'Delete');
+    d.onclick=function(){items=items.filter(function(x){return x!==i});save();render()};
+    a.appendChild(b);a.appendChild(d);c.appendChild(a);L.appendChild(c);
+  });
+}
+CATS.forEach(function(c){var o=document.createElement('option');o.textContent=c;$('fc').appendChild(o)});
+document.querySelectorAll('.seg button').forEach(function(b){b.onclick=function(){
+  type=b.dataset.t;document.querySelectorAll('.seg button').forEach(function(x){x.setAttribute('aria-pressed',x===b)})}});
+$('date').value=today();
+$('post').onclick=function(){
+  var t=$('title').value.trim(),l=$('loc').value.trim(),c=$('contact').value.trim();
+  if(!t||!l||!c){$('err').textContent='Add the item name, location and a contact so people can reach you.';return}
+  $('err').textContent='';
+  items.push({id:Date.now(),type:type,title:t,cat:$('cat').value,loc:l,date:$('date').value||today(),contact:c,desc:$('desc').value.trim(),claimed:false});
+  ['title','loc','contact','desc'].forEach(function(k){$(k).value=''});
+  save();render();
+};
+['q','ft','fc'].forEach(function(k){$(k).addEventListener('input',render)});
+load();render();
+})();
+</script>
+</body>
+</html>
